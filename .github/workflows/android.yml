@@ -29,9 +29,10 @@ jobs:
           mkdir -p $HOME/android-sdk/cmdline-tools
           cd $HOME/android-sdk/cmdline-tools
           curl -o tools.zip https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-          unzip tools.zip
-          mv cmdline-tools latest
+          unzip tools.zip -d cmdline-tools
           mkdir -p $HOME/.android && touch $HOME/.android/repositories.cfg
+          export ANDROID_SDK_ROOT=$HOME/android-sdk
+          yes | $HOME/android-sdk/cmdline-tools/cmdline-tools/bin/sdkmanager --sdk_root=$HOME/android-sdk --licenses
 
       - name: Accept Android SDK licenses
         run: |
