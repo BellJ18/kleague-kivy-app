@@ -34,13 +34,12 @@ jobs:
           mv cmdline-tools latest
           mkdir -p $HOME/.android && touch $HOME/.android/repositories.cfg
 
-
       - name: Accept Android SDK licenses
         run: |
           export ANDROID_SDK_ROOT=$HOME/android-sdk
           yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses
           yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools" "build-tools;30.0.3" "platforms;android-30"
-
+          
       - name: Build APK with Buildozer
         run: |
           export ANDROID_HOME=$HOME/android-sdk
@@ -52,9 +51,10 @@ jobs:
           sed -i 's/^# *source.include_exts =.*/source.include_exts = py,png,jpg,kv,atlas/' buildozer.spec
           sed -i 's/^# *log_level = 1/log_level = 2/' buildozer.spec
           sed -i 's/^# *android.api =.*/android.api = 30/' buildozer.spec
-          sed -i 's/^# *android.sdk_path =.*/android.sdk_path = $HOME\/android-sdk/' buildozer.spec
-          sed -i 's/^# *android.ndk_path =.*/android.ndk_path = $HOME\/android-sdk\/ndk\/20b/' buildozer.spec
+          sed -i "s|^# *android.sdk_path =.*|android.sdk_path = $HOME/android-sdk|" buildozer.spec
+          sed -i "s|^# *android.ndk_path =.*|android.ndk_path = $HOME/android-sdk/ndk/25.2.9519653|" buildozer.spec
           buildozer -v android debug
+
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
