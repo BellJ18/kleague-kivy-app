@@ -53,6 +53,7 @@ jobs:
           sed -i 's/^# *source.include_exts =.*/source.include_exts = py,png,jpg,kv,atlas/' buildozer.spec
           sed -i 's/^# *log_level = 1/log_level = 2/' buildozer.spec
           sed -i 's/^# *android.api =.*/android.api = 30/' buildozer.spec
+          sed -i "/^\\[app\\]/a android.build_tools_version = 30.0.3" buildozer.spec
           sed -i "/^\\[app\\]/a android.build_tools_path = $HOME/android-sdk/build-tools/30.0.3" buildozer.spec
           buildozer -v android debug
 
