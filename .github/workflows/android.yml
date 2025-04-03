@@ -1,16 +1,17 @@
-name: Android APK Build
+name: Build Kivy Android APK
 
 on:
   push:
     branches:
-      - main  # 또는 'master', 저장소 브랜치 이름에 맞게
+      - main  # 또는 master
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -20,39 +21,39 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y git zip unzip openjdk-11-jdk python3-pip python3-setuptools python3-wheel build-essential libtool libffi-dev libssl-dev
+          sudo apt install -y zip unzip openjdk-11-jdk python3-pip build-essential git
           pip install --upgrade pip
           pip install buildozer cython
 
-      - name: Install Android SDK cmdline-tools
+      - name: Install Android SDK command line tools
         run: |
+          mkdir -p $HOME/.android && touch $HOME/.android/repositories.cfg
           mkdir -p $HOME/android-sdk/cmdline-tools
           cd $HOME/android-sdk/cmdline-tools
-          curl -o tools.zip https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-          unzip tools.zip -d cmdline-tools
-          mkdir -p $HOME/.android && touch $HOME/.android/repositories.cfg
+          curl -O https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+          unzip commandlinetools-linux-9477386_latest.zip -d latest
           export ANDROID_SDK_ROOT=$HOME/android-sdk
-          yes | $HOME/android-sdk/cmdline-tools/cmdline-tools/bin/sdkmanager --sdk_root=$HOME/android-sdk --licenses
+          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platforms;android-30" "build-tools;30.0.3" "platform-tools"
 
-      - name: Accept Android SDK licenses
+      - name: Build APK with Buildozer
         run: |
-          yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/android-sdk --licenses
-
-
-      - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses
-
-
-      - name: Build APK
-        run: |
+          export ANDROID_HOME=$HOME/android-sdk
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH
           buildozer init
-          sed -i 's/package.name = .*/package.name = kleagueapp/' buildozer.spec
-          sed -i 's/package.domain = .*/package.domain = org.kleague/' buildozer.spec
-          sed -i 's/^# version = .*/version = 1.0/' buildozer.spec
+          sed -i 's/^# *title =.*/title = KLeague Alarm/' buildozer.spec
+          sed -i 's/^# *package.name =.*/package.name = kleaguealarm/' buildozer.spec
+          sed -i 's/^# *package.domain =.*/package.domain = org.kleague/' buildozer.spec
+          sed -i 's/^# *source.include_exts =.*/source.include_exts = py,png,jpg,kv,atlas/' buildozer.spec
+          sed -i 's/^# *log_level = 1/log_level = 2/' buildozer.spec
+          sed -i 's/^# *android.api =.*/android.api = 30/' buildozer.spec
+          sed -i 's/^# *android.sdk_path =.*/android.sdk_path = $HOME\/android-sdk/' buildozer.spec
+          sed -i 's/^# *android.ndk_path =.*/android.ndk_path = $HOME\/android-sdk\/ndk\/20b/' buildozer.spec
           buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: kleague-app-debug.apk
+          name: kleague-alarm.apk
           path: bin/*.apk
