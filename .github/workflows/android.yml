@@ -24,7 +24,7 @@ jobs:
           sudo apt install -y zip unzip openjdk-11-jdk python3-pip build-essential git
           pip install --upgrade pip
           pip install buildozer cython
-          
+
       - name: Install Android SDK cmdline-tools
         run: |
           mkdir -p $HOME/android-sdk/cmdline-tools
@@ -34,16 +34,13 @@ jobs:
           mv cmdline-tools latest
           mkdir -p $HOME/.android && touch $HOME/.android/repositories.cfg
 
-      - name: Accept Android SDK licenses
+      - name: Accept Android SDK licenses and install SDK packages
         run: |
           export ANDROID_SDK_ROOT=$HOME/android-sdk
           yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses
           yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools" "build-tools;30.0.3" "platforms;android-30"
-
-      - name: Install Android SDK build tools
-        run: |
-          export ANDROID_SDK_ROOT=$HOME/android-sdk
-          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "build-tools;30.0.3"
+          echo "▶ Build-tools 내용 확인:"
+          ls -al $ANDROID_SDK_ROOT/build-tools/30.0.3/
 
       - name: Build APK with Buildozer
         run: |
