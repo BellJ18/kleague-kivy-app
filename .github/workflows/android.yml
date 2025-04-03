@@ -39,7 +39,12 @@ jobs:
           export ANDROID_SDK_ROOT=$HOME/android-sdk
           yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses
           yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools" "build-tools;30.0.3" "platforms;android-30"
-          
+
+      - name: Install Android SDK build tools
+        run: |
+          export ANDROID_SDK_ROOT=$HOME/android-sdk
+          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "build-tools;30.0.3"
+
       - name: Build APK with Buildozer
         run: |
           export ANDROID_HOME=$HOME/android-sdk
